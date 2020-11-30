@@ -4,18 +4,19 @@
   "description": "Lets you use IRC to send inputs to a program and stream it, TwitchPlaysPokemon style",
   "version": "0.0.1",
   "dependencies": {
+    "node-process-windows": "0.0.2",
     "tmi.js": "1.5.0"
   },
   "scripts": {
     "start": "node server.js",
     "lint": "prettier --write *.js",
-    "test": "node -e \"require('child_process').exec('python key.py Notepad a');\""
+    "test": "node -e \"require('child_process').exec('python3 key.py Notepad down');\""
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/hzoo/TwitchPlaysX.git"
   },
   "devDependencies": {
-    "prettier": "2.0.5"
+    "prettier": "^2.0.5"
   }
 }
