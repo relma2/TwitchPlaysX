@@ -1,3 +1,5 @@
+const log = console.log;
+const processWindows = require("node-process-windows");
 let exec = require("child_process").exec,
   config = require("./config.js"),
   lastTime = {},
@@ -8,17 +10,18 @@ let exec = require("child_process").exec,
     "^(" + config.filteredCommands.join("|") + ")$",
     "i"
   );
+let python = config.pyexec;
 
 let isWindows = process.platform === "win32";
 
 (function setWindowID() {
-  if (!isWindows & windowID === "unfilled") {
+  if (!isWindows & (windowID === "unfilled")) {
     exec("xdotool search --onlyvisible --name " + config.programName, function (
       error,
       stdout
     ) {
       windowID = stdout.trim();
-      // console.log(key, windowID);
+      // log(key, windowID);
     });
   }
 })();
@@ -32,12 +35,9 @@ let defaultKeyMap = config.keymap || {
   left: "Left",
   down: "Down",
   right: "Right",
-  a: "a",
-  b: "b",
-  x: "x",
-  y: "y",
-  start: "s",
-  select: "e",
+  inventory: "tab",
+  interact: "e",
+  pass: "enter",
 };
 
 function sendKey(command) {
@@ -56,12 +56,24 @@ function sendKey(command) {
     }
     if (allowKey) {
       if (isWindows) {
-        //use python on windows
-        // "VisualBoyAdvance"
-        // "DeSmuME 0.9.10 x64"
-        exec("python key.py" + "  " + config.programName + " " + key);
+        // account for repeatablity functionality
+        let rstring = "";
+        let splitkey = key.split(" ");
+        if (splitkey.length > 1) {
+          let s = splitkey.pop();
+          if (s.match(new RegExp("[0-9]+", "i"))) {
+            rstring = "--repeat " + s;
+            key = splitkey.join(" ");
+          }
+        }
+        exec(
+          `${python} key.py ${config.programName} ${key.replace(
+            " ",
+            " --params "
+          )} ${rstring}`
+        );
       } else {
-        //Send to preset window under non-windows systems
+        // Send to preset window under non-windows systems
         exec(
           "xdotool key --window " +
             windowID +

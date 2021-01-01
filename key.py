@@ -1,32 +1,39 @@
 # For Windows
-# http://stackoverflow.com/questions/1823762/sendkeys-for-python-3-1-on-windows
-# https://stackoverflow.com/a/38888131
 
-import win32api
-import win32con
-import win32gui
-import time, sys
+import time, sys, platform
+# Operating System dependent imports
+OS = platform.system()
+if OS == 'Windows':
+    import win32api, win32con, win32gui
+elif OS == 'Darwin': # Mac
+    raise NotImplementedError("Mac OS not implemented yet")
+elif OS == 'Linux':
+    raise NotImplementedError("Linux OS not implemented yet")
+else:
+    raise NotImplementedError("Unrecognized operating system")
+import argparse
+from keymap import keymap, keyDelay, THRESHOLD, ARROWKEYS
 
-keyDelay = 0.1
-# https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-keymap = {
-    "Up": win32con.VK_UP,
-    "Left": win32con.VK_LEFT,
-    "Down": win32con.VK_DOWN,
-    "Right": win32con.VK_RIGHT,
-    "b": 0x42, # ord("B"),
-    "a": 0x41, # ord("A"),
-    "y": 0x59, # ord("Y"),  # for DS
-    "x": 0x58, # ord("X"),  # for DS
-    "s": 0x53, # ord("S"),  # Start
-    "e": 0x45, # ord("E"),  # Select
-}
+def repeat(k, f, *args):
+    for _ in range(k):
+        f(*args)
 
 # this way has to keep window in focus
-def sendKey(button):
-    win32api.keybd_event(keymap[button], 0, 0, 0)
-    time.sleep(keyDelay)
-    win32api.keybd_event(keymap[button], 0, win32con.KEYEVENTF_KEYUP, 0)
+def sendKey(b, k, *args):
+    b = b.lower()
+    if k <= 0 or k > THRESHOLD:
+        return
+    # Arrow Key with optional duration
+    if b in ARROWKEYS:
+        repeat(k, keymap['arrow'], b, 0.3 if len(args) == 0 else args[0])
+    # Single alphanumeric key
+    elif b.isalnum() and len(b) == 1:
+        repeat(k, keymap['alphanum'], b)
+    # Custom function - see keymap.py for more
+    else:
+        if b in keymap.keys():
+            repeat(k, keymap[b], *args)
+
 
 def SimpleWindowCheck(windowname):
     window = None
@@ -42,16 +49,24 @@ def SimpleWindowCheck(windowname):
     else:
         return window
 
+print(__name__)
+
 if __name__ == "__main__":
-    windowName = sys.argv[1]
-    key = sys.argv[2]
+    # Parse args
+    parser = argparse.ArgumentParser(description="Send command to game program")
+    parser.add_argument("window", help="name of the program you want to run in", type=str)
+    parser.add_argument("command", help="functionality you want to execute", type=str)
+    parser.add_argument("--repeat", help="nuber of times you wand command to be repeated", default=1, type=int)
+    parser.add_argument("--params", nargs='*', default=[])
+    args = parser.parse_args()
+    windowName = args.window
 
     winId = SimpleWindowCheck(windowName)
-    # winId = None
+    activeWindow = win32gui.GetActiveWindow()
 
     if not (winId):
         windowList = []
-        
+
         def enumHandler(hwnd, list):
             if windowName in win32gui.GetWindowText(hwnd):
                 list.append(hwnd)
@@ -67,4 +82,7 @@ if __name__ == "__main__":
 
     win32gui.ShowWindow(winId, win32con.SW_SHOWNORMAL)
     win32gui.SetForegroundWindow(winId)
-    sendKey(key)
+    # TODO - Implement setting foreground window for other operating systems
+    
+    sendKey(args.command, args.repeat, *(args.params if args.params is not None else []))
+    # TODO - figure out a way to restore the window that was originally active

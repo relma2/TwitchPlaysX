@@ -1,0 +1,53 @@
+usage.txt
+Welcome to our world >:)
+
+Please note commands are CASE SENSITIVE and and must be all lowercase!
+Also please note that severely disrupting game progress, excessive annoyance in chat, or unauthorized drug dealing may get get you tossed in brain jail.
+
+Commands:
+help
+    Whispers this help message to you
+usage
+    Also Whispers this help message to you
+
+left, right, up, or down:
+    Walk in the corresponding direction
+
+<direction> <len>:
+    Walk in direction for length (i.e, presses the arrow key)
+    direction is one of "up", "down", "left", or "right
+    len is optional and can be "short" or "long"
+
+run <dir>
+    runs in the specified direction
+
+skill <dir>
+    uses skill in the corresponding direction out of battle. You ( all >:) ) must have the skill equipped first.
+
+battlerun <dir>
+    Selects the "move" option while in battle and moves in the specified direction.
+    This is because the normal run commands dont work in battle :(
+
+Single alphanumeric character (lowercase)
+    Presses that key. Shortcuts are:
+    e: interact
+    q: skill
+    1-5: inventory menu shortcuts
+
+Other shortcuts:
+tab, inventory
+    Presses <tab>. Opens inventory
+enter, pass
+    Presses <enter>. Passes turn in battle
+back, backspace
+    Presses <backspace>. Used to exit out of menu
+space
+    Presses spacebar.
+interact
+    Presses 'e' to interact
+inventory
+    Presses inventory button (tab)
+
+APPEND Number to any command:
+    ex. left 10
+    repeats the command that number of times. Only users with elevated privileges (like mods) can use this.
